@@ -12,3 +12,7 @@ __pycache__/
 
 # Scratch
 *.log
+
+# Launcher state
+.logs/
+.lumen-state.json

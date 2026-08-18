@@ -130,7 +130,57 @@ S17_MAX_REPEAT_FAILURES=4
 
 Do **not** copy `.env.example`'s `S17_PROTECTED_PATHS` — see bug D.
 
-Then:
+Then start everything with one command:
+
+```powershell
+.\lumen.ps1 start        # Windows
+```
+```bash
+./lumen.sh start          # macOS / Linux / Git-Bash
+```
+
+```
+  Starting Lumen
+  ──────────────────────────────────────────────────────────────
+  ●  Ollama            up      port 11434 · pid 23892 · embeddings only
+  ●  glc_v5 gateway    up      port 8111 · pid 9676 · holds the provider keys
+  ●  S17Code           up      port 8113 · pid 16852 · the agent runtime
+  ●  Lumen proxy       up      port 8115 · pid 6128 · holds the control token
+  ●  Vite dev server   up      port 5173 · pid 5080 · the browser UI
+  ──────────────────────────────────────────────────────────────
+  Open http://127.0.0.1:5173   ·  logs in ./.logs/   ·  stop with ./lumen.sh stop
+```
+
+| Command | What it does |
+|---|---|
+| `start` | brings all five up **in dependency order**, waiting for each to answer its health endpoint before starting the next |
+| `stop` | stops them in reverse, so the browser-facing end goes down before what it depends on |
+| `restart` | both |
+| `status` | what is up, on which port, under which PID |
+| `logs <service>` | last 40 lines of stdout and stderr — `ollama`, `glc`, `s17`, `proxy`, `web` |
+| `doctor` | prerequisites, config, **and today's Gemini quota** |
+
+It waits on health rather than sleeping: a service that never answers is a
+failure to report, not a delay to absorb. Starting when things are already up is
+safe — each service is skipped if it is already listening, and a port held by
+something unhealthy is reported rather than fought over.
+
+`doctor` is the one to run first. It catches the three things that actually
+stop this working:
+
+```
+  ●  control token      ok       set (value not shown)
+  ◐  protected paths    narrow   5 patterns — DEFAULT_PROTECTED has 12
+  ◐  gemini-2.5-flash   exhausted  HTTP 429 — switch GEMINI_MODEL to another bucket
+```
+
+The quota check matters more than it looks: the free tier is 20 requests per day
+**per model, per project**, and the five keys share one project, so rotating keys
+buys nothing. Switching `GEMINI_MODEL` to an untouched bucket does.
+
+Open <http://127.0.0.1:5173>.
+
+If you would rather run them by hand:
 
 ```bash
 ollama serve                                            # embeddings only
@@ -139,8 +189,6 @@ cd S17Code  && uv run s17code serve                     # 8113
 cd lumen/server && uv run --project ../../S17Code python run.py   # 8115
 cd lumen/web && npm install && npm run dev              # 5173
 ```
-
-Open <http://127.0.0.1:5173>.
 
 ---
 
