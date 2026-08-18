@@ -1,0 +1,65 @@
+id: 1
+data: {"type": "RUN_STARTED", "seq": 1, "source_kind": "run_started"}
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+id: 2
+data: {"type": "STATE_DELTA", "seq": 2, "source_kind": "graph_patched", "delta": {"op": "graph_patched", "reason": "planner failed validation after repair: unsupported patch fields: ['decision']", "trigger": 1}}
+
+data: {"type": "RUN_FINISHED", "seq": 3, "source_kind": "derived"}

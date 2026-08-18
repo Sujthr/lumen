@@ -1,0 +1,14 @@
+# Dependencies and build output
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+
+# Local configuration. The control token and provider keys never belong here.
+.env
+.env.*
+!.env.example
+
+# Scratch
+*.log

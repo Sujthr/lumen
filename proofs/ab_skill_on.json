@@ -1,0 +1,49 @@
+{
+  "label": "ab_skill_on",
+  "question": "Is Python's sorted() stable?",
+  "events": [
+    {
+      "at": 5.0,
+      "type": "RUN_STARTED",
+      "step": null
+    },
+    {
+      "at": 30.1,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 30.1,
+      "type": "STEP_STARTED",
+      "step": "final_answer"
+    },
+    {
+      "at": 39.0,
+      "type": "STEP_FINISHED",
+      "step": "final_answer"
+    },
+    {
+      "at": 39.0,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 39.0,
+      "type": "RUN_FINISHED",
+      "step": null
+    }
+  ],
+  "nodes": [
+    "final_answer"
+  ],
+  "commands": [],
+  "planner_reasons": [
+    "Directly answer the question using answer_with_evidence as Python's sorted() stability is a well-established property requiring no external tools.",
+    "terminal text capability final_answer succeeded"
+  ],
+  "run_id": "lumen-830191f908894d30",
+  "seconds": 39.0,
+  "status": "finished",
+  "answer": "Based on the provided evidence, there is no information available to answer whether Python's `sorted()` function is stable.",
+  "failures": []
+}

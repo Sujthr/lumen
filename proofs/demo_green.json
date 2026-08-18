@@ -1,0 +1,90 @@
+{
+  "label": "demo_green",
+  "question": "Write a Python script to a file that proves whether sorted() is stable, then run that script with run_command and report its exit code and stdout.",
+  "events": [
+    {
+      "at": 5.0,
+      "type": "RUN_STARTED",
+      "step": null
+    },
+    {
+      "at": 9.7,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 9.7,
+      "type": "STEP_STARTED",
+      "step": "write_script"
+    },
+    {
+      "at": 9.7,
+      "type": "STEP_FINISHED",
+      "step": "write_script"
+    },
+    {
+      "at": 12.3,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 12.3,
+      "type": "STEP_STARTED",
+      "step": "run_script"
+    },
+    {
+      "at": 12.3,
+      "type": "STEP_FINISHED",
+      "step": "run_script"
+    },
+    {
+      "at": 18.6,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 18.6,
+      "type": "STEP_STARTED",
+      "step": "report_outcome"
+    },
+    {
+      "at": 25.4,
+      "type": "STEP_FINISHED",
+      "step": "report_outcome"
+    },
+    {
+      "at": 25.4,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 25.4,
+      "type": "RUN_FINISHED",
+      "step": null
+    }
+  ],
+  "nodes": [
+    "write_script",
+    "run_script",
+    "report_outcome"
+  ],
+  "commands": [
+    {
+      "command": "python is_stable.py",
+      "exit_code": 0,
+      "stdout": "sorted() is stable.\n",
+      "stderr": ""
+    }
+  ],
+  "planner_reasons": [
+    "launched runnable frontier; held future tasks run_script until outcomes land",
+    "model proposed the next useful frontier",
+    "model proposed the next useful frontier",
+    "terminal text capability report_outcome succeeded"
+  ],
+  "run_id": "lumen-295787083d31409f",
+  "seconds": 25.4,
+  "status": "finished",
+  "answer": "The Python script `is_stable.py` was written to a file. The script defines a custom class `Item` to track original indices and values, then creates a list of `Item` objects with duplicate values but distinct original indices. It sorts this list using `sorted()` and then checks if the relative order of elements with equal values is preserved.\n\nThe script was executed, and the `run_command` output is as follows:\n\nExit Code: 0\nStdout:\n```\nsorted() is stable.\n```",
+  "failures": []
+}

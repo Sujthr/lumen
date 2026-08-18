@@ -1,0 +1,137 @@
+id: 1
+data: {"type": "RUN_STARTED", "seq": 1, "source_kind": "run_started"}
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+id: 2
+data: {"type": "STATE_DELTA", "seq": 2, "source_kind": "graph_patched", "delta": {"op": "graph_patched", "reason": "model proposed the next useful frontier", "trigger": 1}}
+
+id: 3
+data: {"type": "STEP_STARTED", "seq": 3, "source_kind": "task_started", "stepName": "call_web_search_1"}
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+id: 4
+data: {"type": "STEP_FINISHED", "seq": 4, "source_kind": "task_succeeded", "stepName": "call_web_search_1", "delta": {"op": "add", "path": "/results/call_web_search_1", "value": {"backend": "ddgs", "budget_decisions": [], "errors": [], "hits": [{"snippet": "1 day ago - Paris is the capital and largest city of France, with an estimated city population of 2.04 million in an area of 105.4 km2 (40.7 sq mi), and a metropolitan population of 13.2 million as of January 2026. Located on the river Seine in the centre of the \u00cele-de-France region, it is the largest ...", "title": "Paris - Wikipedia", "url": "https://en.wikipedia.org/wiki/Paris"}, {"snippet": "1 day ago - Its metropolitan area extends from ... and the North Sea. Its 18 integral regions\u2014five of which are overseas\u2014span a combined area of 632,702 km2 (244,288 sq mi), with a total population estimated at over 69.1 million in 2026. Its capital, largest city and main cultural and economic centre is Paris, with a metropolitan population of over 13 million. Metropolitan France was settled ...", "title": "France - Wikipedia", "url": "https://en.wikipedia.org/wiki/France"}, {"snippet": "3 days ago - The capital of France is Paris.", "title": "France | History, Maps, Flag, Population, Cities, Capital, & Facts | Britannica", "url": "https://www.britannica.com/place/France"}], "metered_calls": [], "query": "What is the capital of France?"}}}
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+id: 5
+data: {"type": "STATE_DELTA", "seq": 5, "source_kind": "graph_patched", "delta": {"op": "graph_patched", "reason": "All information needed to answer the question is available from the web search results.", "trigger": 4}}
+
+id: 6
+data: {"type": "STEP_STARTED", "seq": 6, "source_kind": "task_started", "stepName": "answer_1"}
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+: keepalive
+
+id: 7
+data: {"type": "STEP_FINISHED", "seq": 7, "source_kind": "task_succeeded", "stepName": "answer_1", "delta": {"op": "add", "path": "/results/answer_1", "value": {"answer": "The capital of France is Paris [https://en.wikipedia.org/wiki/Paris, https://en.wikipedia.org/wiki/France, https://www.britannica.com/place/France].", "budget_decisions": [], "evidence_count": 3, "metered_calls": [], "model": "gemini-2.5-flash", "provider": "gemini_1"}}}
+
+id: 8
+data: {"type": "STATE_DELTA", "seq": 8, "source_kind": "graph_patched", "delta": {"op": "graph_patched", "reason": "terminal text capability answer_1 succeeded", "trigger": 7}}
+
+data: {"type": "RUN_FINISHED", "seq": 9, "source_kind": "derived"}

@@ -1,0 +1,66 @@
+{
+  "label": "ab_skill_off",
+  "question": "Is Python's sorted() stable?",
+  "events": [
+    {
+      "at": 5.1,
+      "type": "RUN_STARTED",
+      "step": null
+    },
+    {
+      "at": 49.7,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 49.7,
+      "type": "STEP_STARTED",
+      "step": "research_python_sorted_stability"
+    },
+    {
+      "at": 60.6,
+      "type": "STEP_FINISHED",
+      "step": "research_python_sorted_stability"
+    },
+    {
+      "at": 98.9,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 98.9,
+      "type": "STEP_STARTED",
+      "step": "final_answer"
+    },
+    {
+      "at": 113.5,
+      "type": "STEP_FINISHED",
+      "step": "final_answer"
+    },
+    {
+      "at": 113.5,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 113.5,
+      "type": "RUN_FINISHED",
+      "step": null
+    }
+  ],
+  "nodes": [
+    "research_python_sorted_stability",
+    "final_answer"
+  ],
+  "commands": [],
+  "planner_reasons": [
+    "Collect authoritative documentation and evidence confirming whether Python's sorted() algorithm is guaranteed to be stable.",
+    "Evidence retrieved confirming Python's sorted() is guaranteed to be stable; answering with evidence.",
+    "terminal text capability final_answer succeeded"
+  ],
+  "run_id": "lumen-e83b2b5fe30c4d96",
+  "seconds": 113.5,
+  "status": "finished",
+  "answer": "Yes, Python's sorts (including `sorted()`) are guaranteed to be stable, meaning that elements with the same key maintain their original relative order (https://docs.python.org/3/howto/sorting.html, https://docs.python.org/3.10/howto/sorting.html).",
+  "failures": []
+}

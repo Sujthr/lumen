@@ -1,0 +1,49 @@
+{
+  "label": "ab_skill_on_2",
+  "question": "Is Python's sorted() stable?",
+  "events": [
+    {
+      "at": 4.9,
+      "type": "RUN_STARTED",
+      "step": null
+    },
+    {
+      "at": 31.7,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 31.7,
+      "type": "STEP_STARTED",
+      "step": "answer"
+    },
+    {
+      "at": 51.6,
+      "type": "STEP_FINISHED",
+      "step": "answer"
+    },
+    {
+      "at": 51.6,
+      "type": "STATE_DELTA",
+      "step": null
+    },
+    {
+      "at": 51.6,
+      "type": "RUN_FINISHED",
+      "step": null
+    }
+  ],
+  "nodes": [
+    "answer"
+  ],
+  "commands": [],
+  "planner_reasons": [
+    "Direct conceptual question about Python's built-in sorted() function; answer directly with evidence.",
+    "terminal text capability answer succeeded"
+  ],
+  "run_id": "lumen-cb9185d6146246d0",
+  "seconds": 51.6,
+  "status": "finished",
+  "answer": "Yes, Python's `sorted()` function is **stable**. \n\nA sorting algorithm is considered stable if it preserves the original relative order of elements that compare as equal (i.e., have the same key or value). Python's standard sorting algorithm (Timsort) guarantees stability.",
+  "failures": []
+}
