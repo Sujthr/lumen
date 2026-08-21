@@ -42,18 +42,14 @@ output that subprocess printed.
 
 Recorded, and on disk as [proofs/demo_green.json](proofs/demo_green.json):
 
-```
+```text
 3 nodes, 1 command run, 0 planner failures, 25.4s
-  $ python is_stable.py  ->  exit 0
-    stdout: "sorted() is stable.
-"
 
-answer: "The script was executed, and the run_command output is as follows:
-         Exit Code: 0
-         Stdout:
-         ```
-         sorted() is stable.
-         ```"
+  $ python is_stable.py  ->  exit 0
+    stdout: "sorted() is stable.\n"
+
+  answer: "The script was executed, and the run_command output is as
+           follows:  Exit Code: 0  Stdout: sorted() is stable."
 ```
 
 The string in the answer is the string the subprocess printed. Nothing in that
