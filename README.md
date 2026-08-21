@@ -91,15 +91,38 @@ them. It may never edit them.
 
 Five terminals' worth of setup, but only four processes.
 
+Clone the two engines **from my forks**, which is where the `integration`
+branches live:
+
 ```bash
-git clone https://github.com/theschoolofai/glc_v5.git
-git clone https://github.com/theschoolofai/S17Code.git
-cd glc_v5  && uv sync && git checkout integration
-cd ../S17Code && uv sync && git checkout integration
+git clone -b integration https://github.com/Sujthr/glc_v5.git
+git clone -b integration https://github.com/Sujthr/S17Code.git
+cd glc_v5     && uv sync && cd ..
+cd S17Code    && uv sync && cd ..
+git clone https://github.com/Sujthr/lumen.git
 ```
 
-`integration` in each repo merges the seven fixes below. On plain `main` the
-verification lane does not work at all — see [Bugs found](#bugs-found).
+The three must sit side by side, because `lumen.sh` finds them as siblings:
+
+```
+some-directory/
+├── glc_v5/
+├── S17Code/
+└── lumen/          <- you run everything from here
+```
+
+`integration` merges the twelve fixes listed under [Bugs found](#bugs-found).
+**On plain `main` the verification lane does not work at all** — `run_command`
+fails at serialization after the command has already run, and on Windows the
+sandbox environment is too small for `import asyncio`, so pytest cannot start.
+Each fix also exists as a standalone branch off `main` if you want them
+individually.
+
+Verify the engines before going further:
+
+```bash
+cd S17Code && uv run pytest -q      # 558 passed
+```
 
 **glc_v5/.env** — provider keys live here and nowhere else:
 
@@ -117,14 +140,26 @@ GLC_BASE_URL=http://127.0.0.1:8111
 S17_PORT=8113
 S17_GATEWAY_PROVIDER=gemini
 S17_CONTROL_TOKEN=<a long random value>
-S17_WORKSPACE=/absolute/path/to/lumen-workspace
-S17_SKILLS_DIR=/absolute/path/to/skills
+S17_WORKSPACE=/absolute/path/to/lumen/workspace
+S17_SKILLS_DIR=/absolute/path/to/lumen/skills
 S17_ALLOWED_COMMANDS=pytest,python,uv,ruff,git,node,npm
 S17_PROTECTED_PATHS=sources/**,tests/**,test/**,**/tests/**,**/test_*.py,**/*_test.py,conftest.py,**/conftest.py,pytest.ini,tox.ini,setup.cfg,pyproject.toml,.github/**
 S17_MAX_REPEAT_FAILURES=4
 ```
 
 Do **not** copy `.env.example`'s `S17_PROTECTED_PATHS` — see bug D.
+
+Both directories those last two point at **ship with this repo**:
+
+| Path | What it is |
+|---|---|
+| `lumen/workspace/` | the only place the agent may write. Contains the demo bug, the protected test that judges it, and `sources/` for fetched evidence. See [workspace/README.md](workspace/README.md) |
+| `lumen/skills/` | `cited-research/SKILL.md` — the markdown that is supposed to change how it works, and [the A/B where it did not](proofs/SKILL_AB.md) |
+
+`workspace/average.py` ships broken on purpose: its docstring promises `0` for an
+empty list and the code raises. That is the red-to-green demo, and `tests/**`
+being protected is what stops the agent deleting the test instead of fixing the
+code.
 
 Then start everything with one command:
 
@@ -229,23 +264,39 @@ and deliberately not `send_channel_message`, `create_calendar_events`,
 
 ## Bugs found
 
-Seven, each on its own branch off `main` with a test that fails before and
-passes after. Full write-ups in [../BUGS.md](../BUGS.md).
+Twelve, each on its own branch off `main` with a test that fails before and
+passes after, and each open as a PR upstream.
 
-| # | Repo | What |
-|---|---|---|
-| A | glc_v5 | `os.chmod` silently no-ops on Windows, so "owner-only" secrets kept `BUILTIN\Users` |
-| B | S17Code | the embedder's fallback was unguarded → raw `URLError` out of every run |
-| C | S17Code | no `tzdata` → `current_datetime` raises for every non-UTC zone |
-| D+E | S17Code | `cp .env.example .env` unprotects 7 of 12 judge paths, and import-time `load_dotenv` blinds the test that would catch it |
-| F | glc_v5 | Gemini thinking never actually disabled: version-string matching, and `"off"` implemented as "don't configure" |
-| G | S17Code | `run_command` returned a dataclass, so **the judge could not report its verdict** |
-| — | S17Code | a caller could not observe the run it started; taken ids silently collided |
+| # | Repo | PR | What |
+|---|---|---|---|
+| A | glc_v5 | [#27](https://github.com/theschoolofai/glc_v5/pull/27) | `os.chmod` silently no-ops on Windows, so "owner-only" secrets kept `BUILTIN\Users` |
+| B | S17Code | [#8](https://github.com/theschoolofai/S17Code/pull/8) | the embedder's fallback was unguarded → raw `URLError` out of every run |
+| C | S17Code | [#7](https://github.com/theschoolofai/S17Code/pull/7) | no `tzdata` → `current_datetime` raises for every non-UTC zone |
+| D+E | S17Code | [#9](https://github.com/theschoolofai/S17Code/pull/9) | `cp .env.example .env` unprotects 7 of 12 judge paths, and import-time `load_dotenv` blinds the test that would catch it |
+| F | glc_v5 | [#28](https://github.com/theschoolofai/glc_v5/pull/28) | Gemini thinking never actually disabled: version-string matching, and `"off"` implemented as "don't configure" |
+| G | S17Code | [#10](https://github.com/theschoolofai/S17Code/pull/10) | `run_command` returned a dataclass, so **the judge could not report its verdict** |
+| H | S17Code | [#12](https://github.com/theschoolofai/S17Code/pull/12) | the allowlist bounded spelling, not behaviour: `node -e`, `npm exec`, `python -m pip`, `argv[0]` as a path |
+| I | S17Code | [#13](https://github.com/theschoolofai/S17Code/pull/13) | a Windows path given as a string became a *different* path, silently |
+| J | S17Code | [#14](https://github.com/theschoolofai/S17Code/pull/14) | the query optimizer knew paths only by extension, so `server.rs` and bare URLs could be dropped |
+| K | S17Code | [#15](https://github.com/theschoolofai/S17Code/pull/15) | a subscription that ends is not a task that finished |
+| L | S17Code | [#23](https://github.com/theschoolofai/S17Code/pull/23) | `read_code`'s output could not be used as `edit_code`'s anchor, so the fix loop never closed |
+| — | S17Code | [#11](https://github.com/theschoolofai/S17Code/pull/11) | a caller could not observe the run it started; taken ids silently collided |
 
 **F and G are why this product could not verify anything.** G broke every
 command at serialization *after* it had run; F starved the planner's output
-budget with uncapped reasoning. Both were found by the product failing, not by
-reading code.
+budget with uncapped reasoning. **L is why it could not fix anything**: reading
+is mandatory before editing, and the read returned a line-numbered view the edit
+could never match, so six identical anchor failures and no green.
+
+None of those were found by reading code. All of them were found by this product
+failing.
+
+Two I am **not** claiming. `#7` duplicates pyru's `#1` and `#10` duplicates
+pyru's `#2`, both filed before mine — I swept only my own open PRs before filing
+and found out afterwards. And the sandbox environment being too small for
+`import asyncio` on Windows is pyru's
+[#3](https://github.com/theschoolofai/S17Code/pull/3); `integration` carries
+their patch, credited in its commit, and no PR of mine covers it.
 
 ---
 
@@ -256,7 +307,7 @@ Stated plainly, because the assignment asks.
 **Claude (Anthropic's Claude Code) wrote**, under my direction and review:
 `server/main.py`, `server/run.py`, all of `web/src/`, `web/verify-ui.mjs`,
 `web/render-check.mjs`, `proofs/capture_run.py`, `proofs/record_run.py`,
-`skills/cited-research/SKILL.md`, and every one of the seven upstream fixes
+`skills/cited-research/SKILL.md`, and every one of the twelve upstream fixes
 including their tests. It also did the diagnosis: the 509s local-model
 measurement, the thinking-token table, the protected-path count.
 
