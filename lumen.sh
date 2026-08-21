@@ -199,6 +199,55 @@ cmd_doctor() {
   printf '\n'
 }
 
+cmd_arm() {
+  # Put the demo bug back so the red-to-green run can be recorded again. The
+  # agent fixes average.py, so a second take would start from green and show
+  # nothing. Prove it is red rather than assuming it.
+  local ws="${S17_WORKSPACE:-}"
+  if [ -z "$ws" ] && [ -f "$WORKSPACE/S17Code/.env" ]; then
+    ws=$(grep -E '^S17_WORKSPACE=' "$WORKSPACE/S17Code/.env" | head -1 | cut -d= -f2- | tr -d '')
+  fi
+  if [ -z "$ws" ] || [ ! -d "$ws" ]; then
+    printf '  %scannot find S17_WORKSPACE%s
+' "$BAD" "$OFF"; return 1
+  fi
+
+  rule "Arming the red-to-green demo"
+  cat > "$ws/average.py" <<'PYEOF'
+def average(numbers):
+    """Mean of a list. Returns 0 for an empty list."""
+    return sum(numbers) / len(numbers)
+PYEOF
+  row "average.py" ok "$OK" "bug restored: raises on an empty list"
+
+  if [ -f "$ws/tests/test_average.py" ]; then
+    row "the test" ok "$OK" "tests/test_average.py — protected from the agent"
+  else
+    row "the test" missing "$BAD" "tests/test_average.py is required"; return 1
+  fi
+
+  local pytest="$WORKSPACE/S17Code/.venv/Scripts/pytest.exe"
+  [ -x "$pytest" ] || pytest="$WORKSPACE/S17Code/.venv/bin/pytest"
+  if [ -x "$pytest" ]; then
+    local out; out=$( cd "$ws" && "$pytest" tests/test_average.py -q 2>&1 )
+    if printf '%s' "$out" | grep -q "failed"; then
+      row "pytest" red "$WARN" "$(printf '%s' "$out" | grep 'failed' | tail -1)"
+    else
+      row "pytest" "not red" "$BAD" "the demo will show nothing — check the fixture"
+    fi
+  fi
+
+  rule
+  printf '  %sNow ask Lumen:%s %s"The test tests/test_average.py is failing. Run pytest
+' "$DIM" "$OFF" "$HI"
+  printf '   to see the failure, then fix average.py so the test passes, then run
+'
+  printf '   pytest again to confirm. Do not modify the test."%s
+
+' "$OFF"
+  return 0
+}
+
 case "${1:-status}" in
   start)   cmd_start ;;
   stop)    cmd_stop ;;
@@ -206,5 +255,6 @@ case "${1:-status}" in
   status)  cmd_status ;;
   logs)    cmd_logs "${2:-}" ;;
   doctor)  cmd_doctor ;;
-  *)       printf 'usage: %s {start|stop|restart|status|logs <service>|doctor}\n' "$0"; exit 2 ;;
+  arm)     cmd_arm ;;
+  *)       printf 'usage: %s {start|stop|restart|status|logs <service>|doctor|arm}\n' "$0"; exit 2 ;;
 esac

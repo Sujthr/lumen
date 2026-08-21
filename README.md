@@ -155,6 +155,7 @@ Then start everything with one command:
 | `status` | what is up, on which port, under which PID |
 | `logs <service>` | last 40 lines of stdout and stderr — `ollama`, `glc`, `s17`, `proxy`, `web` |
 | `doctor` | prerequisites, config, **and today's Gemini quota** |
+| `arm` | re-arm the red-to-green demo: restore the bug in `average.py` and prove pytest is red |
 
 It waits on health rather than sleeping: a service that never answers is a
 failure to report, not a delay to absorb. Starting when things are already up is

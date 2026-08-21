@@ -18,7 +18,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('start', 'stop', 'restart', 'status', 'logs', 'doctor')]
+    [ValidateSet('start', 'stop', 'restart', 'status', 'logs', 'doctor', 'arm')]
     [string]$Command = 'status',
 
     [Parameter(Position = 1)]
@@ -370,8 +370,73 @@ function Invoke-Doctor {
     Write-Host ''
 }
 
+function Invoke-Arm {
+    <#
+        Put the demo bug back so the red-to-green run can be recorded again.
+
+        The agent fixes average.py, which means the second take would start from
+        green and show nothing. This restores the bug and proves the test is red
+        before you hit record — a demo that silently starts green is the same
+        class of mistake as a green check on a control that never ran.
+    #>
+    $ws = $env:S17_WORKSPACE
+    if (-not $ws) {
+        $envFile = Join-Path (Split-Path -Parent $Root) 'S17Code\.env'
+        if (Test-Path $envFile) {
+            $line = Select-String -Path $envFile -Pattern '^S17_WORKSPACE=(.+)$' -ErrorAction SilentlyContinue
+            if ($line) { $ws = ($line.Line -split '=', 2)[1].Trim() }
+        }
+    }
+    if (-not $ws -or -not (Test-Path $ws)) {
+        Write-Host '  cannot find S17_WORKSPACE' -ForegroundColor $Palette.bad
+        return
+    }
+
+    Write-Rule 'Arming the red-to-green demo'
+
+    $buggy = @'
+def average(numbers):
+    """Mean of a list. Returns 0 for an empty list."""
+    return sum(numbers) / len(numbers)
+'@
+    Set-Content -Path (Join-Path $ws 'average.py') -Value $buggy -Encoding utf8
+    Write-Row 'average.py' 'ok' $Palette.ok 'bug restored: raises on an empty list'
+
+    $testFile = Join-Path $ws 'tests\test_average.py'
+    if (Test-Path $testFile) {
+        Write-Row 'the test' 'ok' $Palette.ok 'tests/test_average.py — protected from the agent'
+    }
+    else {
+        Write-Row 'the test' 'missing' $Palette.bad 'tests/test_average.py is required'
+        return
+    }
+
+    # Prove it is red, rather than assuming.
+    $pytest = Join-Path (Split-Path -Parent $Root) 'S17Code\.venv\Scripts\pytest.exe'
+    if (Test-Path $pytest) {
+        Push-Location $ws
+        $out = & $pytest 'tests/test_average.py' '-q' 2>&1 | Out-String
+        Pop-Location
+        if ($out -match '(\d+) failed') {
+            Write-Row 'pytest' 'red' $Palette.warn ($out -split "`n" | Where-Object { $_ -match 'failed' } | Select-Object -Last 1).Trim()
+        }
+        else {
+            Write-Row 'pytest' 'not red' $Palette.bad 'the demo will show nothing — check the fixture'
+        }
+    }
+
+    Write-Rule
+    $global:LASTEXITCODE = 0
+    Write-Host '  Now ask Lumen: ' -NoNewline -ForegroundColor $Palette.dim
+    Write-Host '"The test tests/test_average.py is failing. Run pytest to see' -ForegroundColor $Palette.hi
+    Write-Host '   the failure, then fix average.py so the test passes, then run pytest' -ForegroundColor $Palette.hi
+    Write-Host '   again to confirm. Do not modify the test."' -ForegroundColor $Palette.hi
+    Write-Host ''
+}
+
 switch ($Command) {
     'start' { Invoke-Start }
+    'arm' { Invoke-Arm }
     'stop' { Invoke-Stop }
     'restart' { Invoke-Stop; Invoke-Start }
     'status' { Invoke-Status }
