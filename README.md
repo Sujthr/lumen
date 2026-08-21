@@ -337,10 +337,38 @@ against.
 
 | File | What it shows |
 |---|---|
+| `demo_red_green.json` | **a test going red then green** — `pytest -> exit 1`, the agent edits the code, `pytest -> exit 0` |
 | `demo_green.json` | the verification lane working: 1 command, `exit 0`, answer quoting the real stdout |
 | `demo_refusals.json` | three refusals in one run — a shell metacharacter, the allowlist, and read-before-edit |
 | `demo_verify.json` | the agent writing test files and then answering from documentation without running them — 0 commands, and the UI says so |
 | `ab_skill_off/on/on_2.json` | the skill A/B, including the arm where the skill made it worse |
+
+`demo_red_green.json` is the one the brief asks for. Same run, two commands:
+
+```
+$ pytest -> exit 1     1 failed, 1 passed in 0.04s
+  read_average_py, fix_average_py
+$ pytest -> exit 0     2 passed in 0.01s
+```
+
+`tests/test_average.py` is protected by `S17_PROTECTED_PATHS`, so the cheap way
+out — delete the test, skip it, weaken the assertion — was not available. The
+only route to green was fixing `average.py`, and it did:
+
+```python
+def average(numbers):
+    """Mean of a list. Returns 0 for an empty list."""
+    if not numbers:
+        return 0
+    return sum(numbers) / len(numbers)
+```
+
+Getting that to work took three upstream bugs, all found by this run failing:
+[#23](https://github.com/theschoolofai/S17Code/pull/23) (read_code's output could
+not be used as edit_code's anchor, so the loop could never close),
+[#13](https://github.com/theschoolofai/S17Code/pull/13), and pyru's
+[#3](https://github.com/theschoolofai/S17Code/pull/3), which is not mine and is
+credited as theirs.
 
 `demo_refusals.json` is the one worth reading in full. In a single run the agent
 tried a shell, tried a program off the allowlist, and tried to edit a file it had
